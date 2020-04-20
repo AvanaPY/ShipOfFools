@@ -30,7 +30,7 @@ class ShipOfFoolsGame():
         """
         self._cup.release_all()
 
-    def play_round(self, player : Player):
+    def play_round(self):
         """
             Plays a single round of Ship of Fools for a player.
         """
@@ -46,7 +46,9 @@ class ShipOfFoolsGame():
         if all(self.cup.flags()):
             full_ship_score = 6 + 5 + 4  # The "off score" if you have a ship, captain, and mate.
             score = self.cup.sum - full_ship_score
-            player.score += score
+        else:
+            score = 0
+        return score
 
     def _roll_and_get_input(self):
         """

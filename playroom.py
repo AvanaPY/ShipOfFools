@@ -7,8 +7,8 @@
 import re
 class Player:
     def __init__(self, name):
-        self._name = name
-        self._score = 0
+        self.name = name
+        self.score = 0
 
     def __str__(self):
         return f'Player {self.name.ljust(8)} with score {self.score:2}'
@@ -16,7 +16,10 @@ class Player:
     @property
     def name(self):
         return self._name
-
+    @name.setter
+    def name(self, value):
+        self._name = value
+        
     @property
     def score(self):
         return self._score
@@ -28,7 +31,16 @@ class Player:
         """
             Resets the score to 0.
         """
-        self._score = 0
+        self.score = 0
+
+    def play_round(self, game):
+        """
+            Plays a game of game, updates the player's score, and prints out what score they ended the round with.
+        """
+        score = game.play_round()
+        self.score += score
+
+        print(f'{self.name} finished this round with with a score of {score}')
 
 class Room:
     def __init__(self):
@@ -92,13 +104,8 @@ class Room:
         """
 
         for player in self._players:
-            
-            print('-' * 6 + f' PLAYER {player.name} ' + '-' * 6)
-
-            self._game.pre_round()
-            self._game.play_round(player)
-
-            print(f'{player.name} finished with a score of {player.score}')
+            print('\n' + '-' * 6 + f' PLAYER {player.name} ' + '-' * 6)
+            player.play_round(self.game)
 
     def print_leaderboard(self):
         """
