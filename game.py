@@ -24,33 +24,30 @@ class ShipOfFoolsGame():
     def cup(self):
         return self._cup
 
-    def pre_round(self):
+    def play_round(self):
         """
-        Method to be called before each round.
+            Plays a single round of Ship of Fools for a player and returns a score.
         """
         self._cup.release_all()
 
-    def play_round(self):
-        """
-            Plays a single round of Ship of Fools for a player.
-        """
-        throws = 3
+        max_throws = 3
+        throws = max_throws
         while throws > 0 and not self.all_dice_banked():
-            to_bank = self._roll_and_get_input()
+            to_bank = self._roll_and_get_input(max_throws - throws + 1)
             self._bank(to_bank)
 
             throws -= 1
 
         self.cup.bank_all()
 
-        if all(self.cup.flags()):
+        if all(self._flags()):
             full_ship_score = 6 + 5 + 4  # The "off score" if you have a ship, captain, and mate.
-            score = self.cup.sum - full_ship_score
+            score = self.cup.sum() - full_ship_score
         else:
             score = 0
         return score
 
-    def _roll_and_get_input(self):
+    def _roll_and_get_input(self, roll_counter):
         """
         Rolls all the dice in the game's DieCup, prints the rolls, and then grabs the user's input and parses it into a list of indexes.
 
@@ -58,7 +55,7 @@ class ShipOfFoolsGame():
         """
         self.cup.sort_by_banked()
         self.cup.roll()
-        self.cup.print_rolls()
+        self.cup.print_rolls(roll_counter)
         success = False
         to_bank = None
         while not success:
@@ -135,7 +132,7 @@ class ShipOfFoolsGame():
         #           Index 1 - Captain
         #           Index 2 - Mate
 
-        flags = self.cup.flags()
+        flags = self._flags()
         val = self.cup.value(index)
         
         # Check if value is 6 and we do NOT have a ship
@@ -165,4 +162,21 @@ class ShipOfFoolsGame():
         self.cup.bank(index)
 
     def all_dice_banked(self):
-        return self.cup._all_dice_banked()
+        """
+            Wrapper for cup.all_dice_banked.
+            Returns True if all dice are banked, else False.
+        """
+        return self.cup.all_dice_banked()
+    
+    def _flags(self):
+        """
+            Returns a list of three (3) boolean flags where index
+                0 - Represents if there is a ship
+                1 - Represents if there is a captain
+                2 - Represents if there is a mate
+        """
+        flags = {6:False, 5:False, 4:False}
+        for die in self.cup:
+            if die.value in (6, 5, 4) and die.banked:
+                flags[die.value] = True
+        return [flags[i] for i in flags]

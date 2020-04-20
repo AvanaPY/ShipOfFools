@@ -46,21 +46,24 @@ class DieCup:
     def __str__(self):
         return f'--------------\nDieCup of size {self._size}:\n\n' + ',\n'.join([str(die) for die in self._dice])
     
-    def print_rolls(self):
+    def __iter__(self):
+        for die in self._dice:
+            yield die
+
+    def print_rolls(self, roll_counter):
         """
         Prints out the rolls in the terminal in a nicely fashion.
         """
-        print('—'*(12 + 3 * self._size))
+        print('—'*(12 + 3 * self._size) + f' Roll number {roll_counter}')
         print('Banked |  ' + ' '.join([str(die.banked)[0].ljust(3) for die in self._dice]))
         print('Value  |  ' + ' '.join([str(die.value).ljust(3) for die in self._dice]))
         print('       |  ' + ' '.join(['|'.ljust(3) for _ in range(self._size)]))
         print('Index  |  ' + ' '.join([str(i).ljust(3) for i in range(self._size)]))
         print('—'*(12 + 3 * self._size))
 
-    @property
     def sum(self):
         """
-        Sum of all dice.
+            Return the sum of all dice.
         """
         return sum([die.value for die in self._dice])
 
@@ -116,7 +119,7 @@ class DieCup:
         """
         return self._dice[index].value
 
-    def _all_dice_banked(self):
+    def all_dice_banked(self):
         """
         Returns if all dice are banked or not.
         """
@@ -124,16 +127,3 @@ class DieCup:
             if not die.banked:
                 return False
         return True
-
-    def flags(self):
-        """
-            Returns a list of three (3) boolean flags where index
-                0 - Represents if there is a ship
-                1 - Represents if there is a captain
-                2 - Represents if there is a mate
-        """
-        flags = {6:False, 5:False, 4:False}
-        for die in self._dice:
-            if die.value in (6, 5, 4) and die.banked:
-                flags[die.value] = True
-        return [flags[i] for i in flags]
